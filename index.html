@@ -1,67 +1,741 @@
 <!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="stylesheet" href="./resources/ol.css">
-        <link rel="stylesheet" href="resources/fontawesome-all.min.css">
-        <link href="resources/photon-geocoder-autocomplete.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
-        <link rel="stylesheet" href="./resources/qgis2web.css">
-        <style>
-        html, body {
-            background-color: #ffffff;
-        }
-        .ol-control > * {
-            background-color: #f8f8f8!important;
-            color: #444444!important;
-            border-radius: 0px;
-        }
-        .ol-attribution a, .gcd-gl-input::placeholder, .search-layer-input-search::placeholder {
-            color: #444444!important;
-        }
-        .search-layer-input-search {
-            background-color: #f8f8f8!important;
-        }
-        .ol-control > *:focus, .ol-control >*:hover {
-            background-color: rgba(248, 248, 248, 0.7)!important;
-        } 
-        .ol-control {
-            background-color: rgba(255,255,255,.4) !important;
-            padding: 2px !important;
-        } 
-        </style>
+<html lang="es">
 
-        <style>
-        html, body, #map {
+<head>
+
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport"
+        content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+
+    <!-- ESTILOS ORIGINALES DE QGIS2WEB -->
+
+    <link rel="stylesheet" href="./resources/ol.css">
+
+    <link rel="stylesheet"
+        href="resources/fontawesome-all.min.css">
+
+    <link href="resources/photon-geocoder-autocomplete.min.css"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="./resources/ol-layerswitcher.css">
+
+    <link rel="stylesheet"
+        href="./resources/qgis2web.css">
+
+
+    <!-- ========================= -->
+    <!-- ESTILOS PERSONALIZADOS -->
+    <!-- ========================= -->
+
+    <style>
+
+        html,
+        body {
+
             width: 100%;
             height: 100%;
+
             padding: 0;
             margin: 0;
+
+            background-color: #ffffff;
+
+            font-family: Arial, sans-serif;
+
         }
-        </style>
-        <title></title>
-    </head>
-    <body>
-        <div id="map">
-            <div id="popup" class="ol-popup">
-                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-                <div id="popup-content"></div>
-            </div>
+
+
+        /* MAPA */
+
+        #map {
+
+            width: 100%;
+            height: 100%;
+
+        }
+
+
+        /* CONTROLES DEL MAPA */
+
+        .ol-control > * {
+
+            background-color: #f8f8f8 !important;
+
+            color: #444444 !important;
+
+            border-radius: 0px;
+
+        }
+
+
+        .ol-attribution a,
+        .gcd-gl-input::placeholder,
+        .search-layer-input-search::placeholder {
+
+            color: #444444 !important;
+
+        }
+
+
+        .search-layer-input-search {
+
+            background-color: #f8f8f8 !important;
+
+        }
+
+
+        .ol-control > *:focus,
+        .ol-control > *:hover {
+
+            background-color: rgba(248, 248, 248, 0.7) !important;
+
+        }
+
+
+        .ol-control {
+
+            background-color: rgba(255, 255, 255, .4) !important;
+
+            padding: 2px !important;
+
+        }
+
+
+        /* ================================= */
+        /* PANEL LATERAL IZQUIERDO */
+        /* ================================= */
+
+        #panel-info {
+
+            position: absolute;
+
+            z-index: 2000;
+
+            top: 20px;
+
+            left: 20px;
+
+            width: 270px;
+
+            max-height: calc(100vh - 40px);
+
+            overflow-y: auto;
+
+            background: rgba(255, 255, 255, 0.96);
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+
+        }
+
+
+        /* TITULO */
+
+        #panel-info h1 {
+
+            font-size: 20px;
+
+            color: #253b80;
+
+            margin: 0 0 5px 0;
+
+        }
+
+
+        /* SUBTITULO */
+
+        #panel-info h2 {
+
+            font-size: 14px;
+
+            color: #666666;
+
+            font-weight: normal;
+
+            margin: 0 0 20px 0;
+
+        }
+
+
+        /* TITULOS DE SECCIONES */
+
+        #panel-info h3 {
+
+            font-size: 13px;
+
+            color: #344a91;
+
+            text-transform: uppercase;
+
+            margin-top: 20px;
+
+            margin-bottom: 10px;
+
+            border-bottom: 1px solid #dddddd;
+
+            padding-bottom: 5px;
+
+        }
+
+
+        /* OPCIONES DE CAPAS */
+
+        .capa-boton {
+
+            display: flex;
+
+            align-items: center;
+
+            margin: 10px 0;
+
+            font-size: 14px;
+
+        }
+
+
+        .capa-boton input {
+
+            margin-right: 10px;
+
+            width: 18px;
+
+            height: 18px;
+
+        }
+
+
+        /* ELEMENTOS DE LA LEYENDA */
+
+        .leyenda-item {
+
+            display: flex;
+
+            align-items: center;
+
+            margin: 7px 0;
+
+            font-size: 13px;
+
+        }
+
+
+        /* CUADROS DE COLORES */
+
+        .color {
+
+            width: 16px;
+
+            height: 16px;
+
+            margin-right: 8px;
+
+            border: 1px solid #555555;
+
+        }
+
+
+        /* INFORMACION INFERIOR */
+
+        .nota {
+
+            margin-top: 20px;
+
+            padding-top: 10px;
+
+            border-top: 1px solid #dddddd;
+
+            font-size: 11px;
+
+            color: #666666;
+
+            line-height: 1.4;
+
+        }
+
+
+        /* ========================= */
+
+        /* TITULO SUPERIOR DEL MAPA */
+
+        /* ========================= */
+
+        #titulo-mapa {
+
+            position: absolute;
+
+            z-index: 1500;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 55px;
+
+            background: rgba(37, 59, 128, 0.95);
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            padding-left: 330px;
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+        }
+
+
+    </style>
+
+
+    <title>
+
+        Geovisualizador Urbano - Sector Norte de Machala
+
+    </title>
+
+</head>
+
+
+<body>
+
+
+    <!-- ========================= -->
+
+    <!-- TITULO SUPERIOR -->
+
+    <!-- ========================= -->
+
+    <div id="titulo-mapa">
+
+        Geovisualizador Urbano - Sector Norte de Machala
+
+    </div>
+
+
+    <!-- ========================= -->
+
+    <!-- PANEL LATERAL IZQUIERDO -->
+
+    <!-- ========================= -->
+
+    <div id="panel-info">
+
+
+        <h1>
+
+            Geovisualizador Urbano
+
+        </h1>
+
+
+        <h2>
+
+            Sector Norte de Machala
+
+        </h2>
+
+
+        <h3>
+
+            Capas de análisis
+
+        </h3>
+
+
+        <div class="capa-boton">
+
+            <input type="checkbox" checked>
+
+            <label>
+
+                Uso del suelo
+
+            </label>
+
         </div>
-        <script src="resources/qgis2web_expressions.js"></script>
-        <script src="./resources/functions.js"></script>
-        <script src="./resources/ol.js"></script>
-        <script src="./resources/ol-layerswitcher.js"></script>
-        <script src="resources/photon-geocoder-autocomplete.min.js"></script>
-        <script src="resources/olms.js"></script>
-        <script src="layers/hidrografia_1.js"></script><script src="layers/LIMITE__2.js"></script><script src="layers/parcelas_3.js"></script><script src="layers/areas_verdes_4.js"></script><script src="layers/lotes_urbanos_5.js"></script><script src="layers/red_vial_6.js"></script><script src="layers/equipamientos_7.js"></script><script src="layers/buffer_salud_8.js"></script><script src="layers/buffer_educacin_9.js"></script>
-        <script src="styles/hidrografia_1_style.js"></script><script src="styles/LIMITE__2_style.js"></script><script src="styles/parcelas_3_style.js"></script><script src="styles/areas_verdes_4_style.js"></script><script src="styles/lotes_urbanos_5_style.js"></script><script src="styles/red_vial_6_style.js"></script><script src="styles/equipamientos_7_style.js"></script><script src="styles/buffer_salud_8_style.js"></script><script src="styles/buffer_educacin_9_style.js"></script>
-        <script src="./layers/layers.js" type="text/javascript"></script> 
-        <script src="./resources/Autolinker.min.js"></script>
-        <script src="./resources/qgis2web.js"></script>        
-    </body>
+
+
+        <div class="capa-boton">
+
+            <input type="checkbox">
+
+            <label>
+
+                Equipamientos
+
+            </label>
+
+        </div>
+
+
+        <div class="capa-boton">
+
+            <input type="checkbox">
+
+            <label>
+
+                Accesibilidad educativa
+
+            </label>
+
+        </div>
+
+
+        <div class="capa-boton">
+
+            <input type="checkbox">
+
+            <label>
+
+                Accesibilidad de salud
+
+            </label>
+
+        </div>
+
+
+        <div class="capa-boton">
+
+            <input type="checkbox">
+
+            <label>
+
+                Zonas de riesgo
+
+            </label>
+
+        </div>
+
+
+        <div class="capa-boton">
+
+            <input type="checkbox" checked>
+
+            <label>
+
+                Límite del sector
+
+            </label>
+
+        </div>
+
+
+        <!-- ========================= -->
+
+        <!-- LEYENDA -->
+
+        <!-- ========================= -->
+
+        <h3>
+
+            Leyenda - Uso del suelo
+
+        </h3>
+
+
+        <div class="leyenda-item">
+
+            <span class="color"
+
+                style="background:#e6a23c;">
+
+            </span>
+
+            Residencial
+
+        </div>
+
+
+        <div class="leyenda-item">
+
+            <span class="color"
+
+                style="background:#e74c3c;">
+
+            </span>
+
+            Comercial / Mixto
+
+        </div>
+
+
+        <div class="leyenda-item">
+
+            <span class="color"
+
+                style="background:#3f6dcc;">
+
+            </span>
+
+            Equipamiento
+
+        </div>
+
+
+        <div class="leyenda-item">
+
+            <span class="color"
+
+                style="background:#2e9e62;">
+
+            </span>
+
+            Área verde
+
+        </div>
+
+
+        <div class="leyenda-item">
+
+            <span class="color"
+
+                style="background:#777777;">
+
+            </span>
+
+            Suelo vacante
+
+        </div>
+
+
+        <!-- ========================= -->
+
+        <!-- NOTA -->
+
+        <!-- ========================= -->
+
+        <div class="nota">
+
+
+            <b>
+
+                Mapa base:
+
+            </b>
+
+            OpenStreetMap.
+
+
+            <br>
+
+            <br>
+
+
+            La información presentada corresponde
+
+            al análisis territorial del sector norte
+
+            de Machala.
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ========================= -->
+
+    <!-- MAPA -->
+
+    <!-- ========================= -->
+
+    <div id="map">
+
+
+        <div id="popup"
+
+            class="ol-popup">
+
+
+            <a href="#"
+
+                id="popup-closer"
+
+                class="ol-popup-closer">
+
+            </a>
+
+
+            <div id="popup-content">
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ========================= -->
+
+    <!-- SCRIPTS ORIGINALES -->
+
+    <!-- ========================= -->
+
+
+    <script src="resources/qgis2web_expressions.js">
+
+    </script>
+
+
+    <script src="./resources/functions.js">
+
+    </script>
+
+
+    <script src="./resources/ol.js">
+
+    </script>
+
+
+    <script src="./resources/ol-layerswitcher.js">
+
+    </script>
+
+
+    <script src="resources/photon-geocoder-autocomplete.min.js">
+
+    </script>
+
+
+    <script src="resources/olms.js">
+
+    </script>
+
+
+    <!-- CAPAS -->
+
+    <script src="layers/hidrografia_1.js">
+
+    </script>
+
+
+    <script src="layers/LIMITE__2.js">
+
+    </script>
+
+
+    <script src="layers/parcelas_3.js">
+
+    </script>
+
+
+    <script src="layers/areas_verdes_4.js">
+
+    </script>
+
+
+    <script src="layers/lotes_urbanos_5.js">
+
+    </script>
+
+
+    <script src="layers/red_vial_6.js">
+
+    </script>
+
+
+    <script src="layers/equipamientos_7.js">
+
+    </script>
+
+
+    <script src="layers/buffer_salud_8.js">
+
+    </script>
+
+
+    <script src="layers/buffer_educacin_9.js">
+
+    </script>
+
+
+    <!-- ESTILOS DE CAPAS -->
+
+    <script src="styles/hidrografia_1_style.js">
+
+    </script>
+
+
+    <script src="styles/LIMITE__2_style.js">
+
+    </script>
+
+
+    <script src="styles/parcelas_3_style.js">
+
+    </script>
+
+
+    <script src="styles/areas_verdes_4_style.js">
+
+    </script>
+
+
+    <script src="styles/lotes_urbanos_5_style.js">
+
+    </script>
+
+
+    <script src="styles/red_vial_6_style.js">
+
+    </script>
+
+
+    <script src="styles/equipamientos_7_style.js">
+
+    </script>
+
+
+    <script src="styles/buffer_salud_8_style.js">
+
+    </script>
+
+
+    <script src="styles/buffer_educacin_9_style.js">
+
+    </script>
+
+
+    <!-- FUNCIONES DE QGIS2WEB -->
+
+    <script src="./layers/layers.js"
+
+        type="text/javascript">
+
+    </script>
+
+
+    <script src="./resources/Autolinker.min.js">
+
+    </script>
+
+
+    <script src="./resources/qgis2web.js">
+
+    </script>
+
+
+</body>
+
 </html>
